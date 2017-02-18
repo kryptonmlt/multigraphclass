@@ -6,4 +6,7 @@ package org.kryptonmlt.graph.multigraph;
  */
 public class MultiGraphApplication {
     
+    public static void main(String[] args){
+        
+    }
 }
