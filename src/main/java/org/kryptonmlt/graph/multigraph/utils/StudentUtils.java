@@ -1,6 +1,7 @@
 package org.kryptonmlt.graph.multigraph.utils;
 
 import org.apache.commons.math3.linear.RealMatrix;
+import org.kryptonmlt.graph.multigraph.generator.StudentGraphCreator;
 import org.kryptonmlt.graph.multigraph.pojos.Student;
 
 /**
@@ -23,6 +24,7 @@ public class StudentUtils {
 
     public static void addUndirectedEdge(RealMatrix m, int i, int j, double v) {
         System.out.println(i + "," + j + " m:" + v);
+        System.out.println(StudentGraphCreator.graphLabels[i] + "," + StudentGraphCreator.graphLabels[j] + " m:" + v);
         //m.addToEntry(i, j, v);
         m.setEntry(i, j, v);
         if (i != j) {

@@ -18,6 +18,7 @@ public class StudentGraphCreator {
     private static final float COURSE_PROBABILITY = 0.5f;
     private static final float TOPIC_PROBABILITY_DEGRADE = 0.2f;
     private final int studentRows;
+    public static String[] graphLabels;
 
     public StudentGraphCreator() {
         int rows = 1;//student himself
@@ -31,6 +32,26 @@ public class StudentGraphCreator {
             }
         }
         this.studentRows = rows;
+        graphLabels = new String[this.studentRows];
+        int count = 0;
+        graphLabels[count] = "Student";
+        count++;
+        for (int c = 0; c < Data.COURSES.length; c++, count++) {
+            graphLabels[count] = Data.COURSES[c];
+            count++;
+            String[] topics = Data.getTopics(c);
+            for (int t = 0; t < topics.length; t++, count++) {
+                graphLabels[count] = topics[t];
+                count++;
+                String[] assessments = Data.getAssesmentPerTopic(c, t);
+                for (int a = 0; a < assessments.length; a++, count++) {
+                    graphLabels[count] = assessments[a];
+                }
+                count--;
+            }
+            count--;
+        }
+
         System.out.println("Matrix size: " + studentRows);
     }
 
@@ -88,13 +109,14 @@ public class StudentGraphCreator {
                 StudentUtils.addUndirectedEdge(studentMatrix2, Data.getCoursePositionInMatrix(course), Data.getTopicPositionInMatrix(course, topic), 1);
                 int m = 0;
                 for (Float mark : student.getMarksPerTopic().get(course).get(topic)) {
-                    StudentUtils.addUndirectedEdge(studentMatrix, Data.getCoursePositionInMatrix(course), Data.getAssessmentPositionInMatrix(course, topic, m), mark);
-                    StudentUtils.addUndirectedEdge(studentMatrix2, Data.getCoursePositionInMatrix(course), Data.getAssessmentPositionInMatrix(course, topic, m), mark);
+                    StudentUtils.addUndirectedEdge(studentMatrix, Data.getTopicPositionInMatrix(course, topic), Data.getAssessmentPositionInMatrix(course, topic, m), mark);
+                    StudentUtils.addUndirectedEdge(studentMatrix2, Data.getTopicPositionInMatrix(course, topic), Data.getAssessmentPositionInMatrix(course, topic, m), mark);
                     m++;
                 }
             }
         }
         student.setStudentGraph(studentMatrix);
+        student.setRawData(studentMatrix2);
         System.out.println(Arrays.deepToString(studentMatrix2));
         return student;
     }

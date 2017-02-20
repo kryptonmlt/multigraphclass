@@ -19,6 +19,7 @@ public class Student {
     //maps course to 
     private Map<Integer, Map<Integer, List<Float>>> marksPerTopic = new HashMap<>();
     private RealMatrix studentGraph;
+    private double[][] rawData;
 
     public Student(String name) {
         this.name = name;
@@ -76,6 +77,14 @@ public class Student {
 
     public void setStudentGraph(RealMatrix studentGraph) {
         this.studentGraph = studentGraph;
+    }
+
+    public double[][] getRawData() {
+        return rawData;
+    }
+
+    public void setRawData(double[][] rawData) {
+        this.rawData = rawData;
     }
 
 }

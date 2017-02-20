@@ -38,11 +38,11 @@ public class Data {
     }
 
     public static int getCoursePositionInMatrix(int course) {
-        return 1 + course;
+        return 1 + (course * TOPICS_PER_COURSE * ASSESSMENTS_PER_COURSE) + (course * TOPICS_PER_COURSE) + (1 * course);
     }
 
     public static int getTopicPositionInMatrix(int course, int topic) {
-        return 1 + COURSES.length + (course * TOPICS_PER_COURSE * ASSESSMENTS_PER_COURSE) + (topic * ASSESSMENTS_PER_COURSE) + (1 * topic);
+        return getCoursePositionInMatrix(course) + (topic * ASSESSMENTS_PER_COURSE) + 1 + topic;
     }
 
     public static int getAssessmentPositionInMatrix(int course, int topic, int assessment) {
