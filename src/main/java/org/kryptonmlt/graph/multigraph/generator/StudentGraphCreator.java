@@ -60,8 +60,8 @@ public class StudentGraphCreator {
      *
      * @return
      */
-    public Student createRandomStudent() {
-        Student student = new Student(UUID.randomUUID().toString());
+    public Student createRandomStudent(String name) {
+        Student student = new Student(name);
         //choosing COURSES
         for (int i = 0; i < Data.COURSES.length; i++) {
             float chosen = RANDOM.nextFloat();
@@ -88,6 +88,7 @@ public class StudentGraphCreator {
                         } else {
                             mark = RANDOM.nextFloat();
                         }
+                        mark = 1.0f;
                         student.addMarksPerTopic(course, i, mark);
                     }
                 } else {
