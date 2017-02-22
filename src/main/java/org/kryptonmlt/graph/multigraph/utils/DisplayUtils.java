@@ -20,7 +20,7 @@ public class DisplayUtils {
 
     }
 
-    public static Graph createGraphFromMatrix(String name, RealMatrix studentGraph, List<List<Integer>> clusters) {
+    public static Graph createGraphFromMatrix(String name, RealMatrix studentGraph, List<List<Integer>> clusters, String[] labels) {
         double[][] matrix = studentGraph.getData();
         Graph graph = new SingleGraph(name);
         StringBuilder css = new StringBuilder();
@@ -36,9 +36,9 @@ public class DisplayUtils {
         for (int i = 0; i < matrix.length; i++) {
             Node n = graph.addNode("" + i);
             if (i == 0) {
-                n.addAttribute("ui.label", "Student: " + name);
+                n.addAttribute("ui.label", name);
             } else {
-                n.addAttribute("ui.label", "" + StudentGraphCreator.graphLabels[i]);
+                n.addAttribute("ui.label", "" + labels[i]);
             }
             if (clusters != null) {
                 n.addAttribute("ui.class", "cluster" + RealMatrixUtils.fitsIn(i, clusters));

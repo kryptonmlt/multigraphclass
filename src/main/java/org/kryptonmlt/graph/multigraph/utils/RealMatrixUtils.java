@@ -1,5 +1,7 @@
 package org.kryptonmlt.graph.multigraph.utils;
 
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -8,12 +10,19 @@ import org.apache.commons.math3.linear.EigenDecomposition;
 import org.apache.commons.math3.linear.LUDecomposition;
 import org.apache.commons.math3.linear.RealMatrix;
 import org.apache.commons.math3.linear.RealVector;
+import org.apache.commons.math3.ml.clustering.CentroidCluster;
+import org.apache.commons.math3.ml.clustering.Clusterable;
+import org.apache.commons.math3.ml.clustering.KMeansPlusPlusClusterer;
+import org.kryptonmlt.graph.multigraph.pojos.Student;
+import org.kryptonmlt.graph.multigraph.pojos.StudentPoint;
 
 /**
  *
  * @author kurt
  */
 public class RealMatrixUtils {
+
+    private static final int MAXIMUM_ITERATIONS = 100000;
 
     private RealMatrixUtils() {
 
@@ -90,69 +99,67 @@ public class RealMatrixUtils {
     }
 
     public static void printMatrix(String name, RealMatrix matrix) {
-        System.out.println("Matrix: " + name);
-        for (int i = 0; i < matrix.getRowDimension(); i++) {
-            System.out.println(Arrays.toString(matrix.getRow(i)));
-        }
-    }
-
-    public static List<List<Integer>> get2Clusters(RealMatrix matrix) {
-        List<List<Integer>> clusters = new ArrayList<>(2);
-        clusters.add(new ArrayList<>());
-        clusters.add(new ArrayList<>());
-
-        EigenDecomposition ed = new EigenDecomposition(matrix);
-        System.out.println("eigen values size: " + ed.getRealEigenvalues().length);
-        System.out.println(Arrays.toString(ed.getRealEigenvalues()));
-        RealVector eigenVector = ed.getEigenvector(ed.getRealEigenvalues().length - 2);
-        System.out.println("eigenvector size: " + eigenVector.getDimension());
-        System.out.println(eigenVector.toString());
-        double total = 0;
-        for (int e = 0; e < eigenVector.toArray().length; e++) {
-            total += eigenVector.toArray()[e];
-            double sign = Math.signum(eigenVector.toArray()[e]);
-            if (sign < 0) {
-                clusters.get(0).add(e);
-            } else {
-                clusters.get(1).add(e);
+        try {
+            System.out.println("Matrix: " + name);
+            PrintWriter writer = new PrintWriter(name + ".txt", "UTF-8");
+            for (int i = 0; i < matrix.getRowDimension(); i++) {
+                //System.out.println(Arrays.toString(matrix.getRow(i)));
+                writer.println(Arrays.toString(matrix.getRow(i)));
             }
+            writer.close();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-        System.out.println("total= " + total);
-        return clusters;
     }
 
-    public static List<List<Integer>> get2ClustersNonZero(RealMatrix matrix) {
-        List<List<Integer>> clusters = new ArrayList<>(2);
-        clusters.add(new ArrayList<>());
-        clusters.add(new ArrayList<>());
+    public static List<List<Integer>> getClustersNonZero(RealMatrix matrix, int k, boolean useZero) {
+
+        if (k == 0) {
+            throw new IllegalArgumentException("K cannot be equal to zero");
+        }
+
+        List<List<Integer>> clusters = new ArrayList<>(k);
+        for (int i = 0; i < k; i++) {
+            clusters.add(new ArrayList<>());
+        }
 
         EigenDecomposition ed = new EigenDecomposition(matrix);
         System.out.println("eigen values size: " + ed.getRealEigenvalues().length);
         System.out.println(Arrays.toString(ed.getRealEigenvalues()));
 
+        //int find = k;
         int find = 2;
         int chosen = 0;
-        for (int i = ed.getRealEigenvalues().length - 1; i >= 0; i--) {
-            if (ed.getRealEigenvalues()[i] != 0) {
-                find--;
-                if (find == 0) {
-                    chosen = i;
-                    break;
+        if (useZero) {
+            chosen = ed.getRealEigenvalues().length - k;
+        } else {
+            for (int i = ed.getRealEigenvalues().length - 1; i >= 0; i--) {
+                if (ed.getRealEigenvalues()[i] != 0) {
+                    find--;
+                    if (find == 0) {
+                        chosen = i;
+                        break;
+                    }
                 }
             }
         }
 
         RealVector eigenVector = ed.getEigenvector(chosen);
+        List<Clusterable> values = new ArrayList<>();
         System.out.println("eigenvector size: " + eigenVector.getDimension());
         System.out.println(eigenVector.toString());
         double total = 0;
         for (int e = 0; e < eigenVector.toArray().length; e++) {
             total += eigenVector.toArray()[e];
-            double sign = Math.signum(eigenVector.toArray()[e]);
-            if (sign < 0) {
-                clusters.get(0).add(e);
-            } else {
-                clusters.get(1).add(e);
+            double[] point = {eigenVector.toArray()[e]};
+            StudentPoint p = new StudentPoint(e, point);
+            values.add(p);
+        }
+        KMeansPlusPlusClusterer kmeans = new KMeansPlusPlusClusterer(k, MAXIMUM_ITERATIONS);
+        List<CentroidCluster> result = kmeans.cluster(values);
+        for (int c = 0; c < result.size(); c++) {
+            for (Object sp : result.get(c).getPoints()) {
+                clusters.get(c).add(((StudentPoint) sp).getId());
             }
         }
         System.out.println("total= " + total);
@@ -212,10 +219,31 @@ public class RealMatrixUtils {
         for (int i = 0; i < m.getRowDimension(); i++) {
             for (int j = 0; j < m.getColumnDimension(); j++) {
                 if (i != j && m.getEntry(i, j) != 0) {
-                    size++;                    
+                    size++;
                 }
             }
         }
         return size;
+    }
+
+    public static RealMatrix joinStudentMatrices(List<Student> students) {
+        List<RealMatrix> matrices = new ArrayList<>();
+        students.forEach((s) -> {
+            matrices.add(s.getStudentGraph());
+        });
+        return RealMatrixUtils.joinMatrices(matrices);
+    }
+
+    public static RealMatrix joinMatrices(List<RealMatrix> matrices) {
+        RealMatrix realMatrix = new Array2DRowRealMatrix(matrices.get(0).getRowDimension() * matrices.size(), matrices.get(0).getColumnDimension() * matrices.size());
+        for (int m = 0; m < matrices.size(); m++) {
+            RealMatrix matrix = matrices.get(m);
+            realMatrix.setSubMatrix(matrix.getData(), m * matrix.getRowDimension(), m * matrix.getColumnDimension());
+            //connect students
+            for (int i = 0; i < matrices.size(); i++) {
+                realMatrix.setEntry(m * matrix.getRowDimension(), i * matrix.getColumnDimension(), 0);
+            }
+        }
+        return realMatrix;
     }
 }
