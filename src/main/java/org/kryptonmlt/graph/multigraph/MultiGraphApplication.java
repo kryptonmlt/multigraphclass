@@ -51,8 +51,8 @@ public class MultiGraphApplication {
                 allStudentsLabels[i] = "Student: " + j;
                 j++;
             } else {
-                allStudentsLabels[i] = StudentGraphCreator.graphLabels[mod];
-            }
+                allStudentsLabels[i] = StudentGraphCreator.graphLabels[mod]; 
+           }
         }
         System.out.println(Arrays.toString(allStudentsLabels));
         System.out.println(Arrays.toString(StudentGraphCreator.graphLabels));

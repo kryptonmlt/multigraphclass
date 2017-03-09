@@ -3,7 +3,6 @@ package org.kryptonmlt.graph.multigraph.generator;
 import org.kryptonmlt.graph.multigraph.utils.StudentUtils;
 import java.util.Arrays;
 import java.util.Random;
-import java.util.UUID;
 import org.apache.commons.math3.linear.Array2DRowRealMatrix;
 import org.apache.commons.math3.linear.RealMatrix;
 import org.kryptonmlt.graph.multigraph.pojos.Student;
