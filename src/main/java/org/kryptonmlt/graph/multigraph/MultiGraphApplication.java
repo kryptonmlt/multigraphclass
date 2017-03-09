@@ -5,6 +5,8 @@ import java.util.Arrays;
 import java.util.List;
 import org.apache.commons.math3.linear.RealMatrix;
 import org.kryptonmlt.graph.multigraph.generator.StudentGraphCreator;
+import org.kryptonmlt.graph.multigraph.kernels.simrank.BasicSimilarity;
+import org.kryptonmlt.graph.multigraph.kernels.simrank.SimRank;
 import org.kryptonmlt.graph.multigraph.pojos.Student;
 import org.kryptonmlt.graph.multigraph.utils.DisplayUtils;
 import org.kryptonmlt.graph.multigraph.utils.RealMatrixUtils;
@@ -25,8 +27,8 @@ public class MultiGraphApplication {
             System.out.println(student.getStudentGraph().toString());
             students.add(student);
         }
-        
-        for (int s = 0; s < 0; s++) {
+
+        for (int s = 0; s < 2; s++) {
             Student student = students.get(s);
             System.out.println("student: " + s);
             RealMatrixUtils.printMatrix("Original", student.getStudentGraph());
@@ -37,13 +39,34 @@ public class MultiGraphApplication {
             RealMatrix normalizedLaplacian = RealMatrixUtils.getLaplacianMatrix(student.getStudentGraph(), true);
             RealMatrixUtils.printMatrix("NormalizedLaplacian", normalizedLaplacian);
             //DisplayUtils.displayGraph(DisplayUtils.createGraphFromMatrix("Nlap " + s, student.getStudentGraph(), RealMatrixUtils.get2Clusters(normalizedLaplacian)));
-            DisplayUtils.displayGraph(DisplayUtils.createGraphFromMatrix("" + s, student.getStudentGraph(), RealMatrixUtils.getClustersNonZero(normalizedLaplacian, student.getCourses().size(), false), StudentGraphCreator.graphLabels));
+            int coursesOfStudent = student.getCourses().size();
+            if (coursesOfStudent == 0) {
+                coursesOfStudent++;
+            }
+            DisplayUtils.displayGraph(DisplayUtils.createGraphFromMatrix("" + s, student.getStudentGraph(), RealMatrixUtils.getClustersNonZero(normalizedLaplacian, coursesOfStudent, false), StudentGraphCreator.graphLabels));
             System.out.println("finished drawing student " + s);
         }
 
-        RealMatrix allStudents = RealMatrixUtils.joinStudentMatrices(students);
-        RealMatrix normalizedLaplacian = RealMatrixUtils.getLaplacianMatrix(allStudents, true);
-        RealMatrixUtils.printMatrix("NormalizedLaplacian", normalizedLaplacian);
+        //RealMatrix allStudents = RealMatrixUtils.joinStudentMatrices(students);
+        //RealMatrix normalizedLaplacian = RealMatrixUtils.getLaplacianMatrix(allStudents, true);
+        //DisplayUtils.displayGraph(DisplayUtils.createGraphFromMatrix("0", allStudents, RealMatrixUtils.getClustersNonZero(normalizedLaplacian, 2, false), allStudentsLabels));
+        //System.out.println(RandomWalk.calculateKWalk(students.get(0).getStudentGraph(), students.get(1).getStudentGraph(), 0.9));
+        SimRank simRank = new SimRank(students.get(0).getStudentGraph(), students.get(1).getStudentGraph());
+        System.out.println("Similarity 0 to 1 : " + simRank.similarity());
+        SimRank simRank2 = new SimRank(students.get(0).getStudentGraph(), students.get(0).getStudentGraph());
+        System.out.println("Similarity 0 to 0 : " + simRank2.similarity());
+        SimRank simRank3 = new SimRank(students.get(1).getStudentGraph(), students.get(0).getStudentGraph());
+        System.out.println("Similarity 1 to 0 : " + simRank3.similarity());
+        SimRank simRank4 = new SimRank(students.get(1).getStudentGraph(), students.get(1).getStudentGraph());
+        System.out.println("Similarity 1 to 1 : " + simRank4.similarity());
+        BasicSimilarity basicSim = new BasicSimilarity(students.get(0).getStudentGraph(), students.get(1).getStudentGraph());
+        System.out.println("BasicSimilarity 0 to 1 : " + basicSim.similarity());
+        BasicSimilarity basicSim2 = new BasicSimilarity(students.get(0).getStudentGraph(), students.get(0).getStudentGraph());
+        System.out.println("BasicSimilarity 0 to 0 : " + basicSim2.similarity());
+        //System.out.println(RandomWalk.calculateKWalk(students.get(0).getStudentGraph(), students.get(1).getStudentGraph(), 0.9));
+    }
+
+    public String[] createAllLabels(int maxStudents) {
         String[] allStudentsLabels = new String[maxStudents * StudentGraphCreator.graphLabels.length];
         for (int i = 0, j = 0; i < allStudentsLabels.length; i++) {
             int mod = i % StudentGraphCreator.graphLabels.length;
@@ -54,11 +77,6 @@ public class MultiGraphApplication {
                 allStudentsLabels[i] = StudentGraphCreator.graphLabels[mod]; 
            }
         }
-        System.out.println(Arrays.toString(allStudentsLabels));
-        System.out.println(Arrays.toString(StudentGraphCreator.graphLabels));
-        //DisplayUtils.displayGraph(DisplayUtils.createGraphFromMatrix("0", allStudents, null, allStudentsLabels));
-        DisplayUtils.displayGraph(DisplayUtils.createGraphFromMatrix("0", allStudents, RealMatrixUtils.getClustersNonZero(normalizedLaplacian, 2, false), allStudentsLabels));
-
-        //System.out.println(RandomWalk.calculateKWalk(students.get(0).getStudentGraph(), students.get(1).getStudentGraph(), 0.9));
+        return allStudentsLabels;
     }
 }

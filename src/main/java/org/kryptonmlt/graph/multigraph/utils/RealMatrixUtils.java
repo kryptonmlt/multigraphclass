@@ -214,6 +214,11 @@ public class RealMatrixUtils {
         }
     }
 
+    /**
+     * Counts edges
+     * @param m
+     * @return 
+     */
     public static int sizeOfMatrix(RealMatrix m) {
         int size = 0;
         for (int i = 0; i < m.getRowDimension(); i++) {
