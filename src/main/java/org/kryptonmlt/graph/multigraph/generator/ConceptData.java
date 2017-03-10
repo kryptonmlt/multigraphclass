@@ -113,11 +113,11 @@ public class ConceptData {
     }
 
     public static int getLecturePositionInMatrix(int lecture) {
-        return 1 + COURSES.length + 1 + lecture;
+        return 1 + COURSES.length + lecture;
     }
 
     public static int getConceptPositionInMatrix(int concept) {
-        return 1 + COURSES.length + 1 + LECTURES.length + 1 + concept;
+        return 1 + COURSES.length + LECTURES.length + concept;
     }
 
 }

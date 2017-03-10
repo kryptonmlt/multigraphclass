@@ -20,6 +20,13 @@ public class SimRank {
         this.b = b;
     }
 
+    public SimRank(RealMatrix a, RealMatrix b, float c, int k) {
+        this.a = a;
+        this.b = b;
+        this.c = c;
+        this.k = k;
+    }
+
     /**
      * assume n*n matrix
      *
@@ -29,37 +36,18 @@ public class SimRank {
         return s(0, 0, 0);
     }
 
-    public void computeSimRank(int i, int j, int iter) {
-        Set<Integer> currentA = inNeighbors(a, i);
-        Set<Integer> currentB = inNeighbors(b, j);
-        Set<Integer> nextA = new HashSet<>();
-        Set<Integer> nextB = new HashSet<>();
-
-        float similarity = 0;
-        while (iter-- > 0) {
-            if (currentA.isEmpty() || currentB.isEmpty()) {
-                continue;
-            }
-            float sum = 0;
-            for (Integer ai : currentA) {
-                for (Integer bj : currentB) {
-                    if (ai.intValue() == bj.intValue()) {
-                        sum += 1f;
-                    } else if (iter < k) {
-                        sum += s(ai, bj, iter + 1);
-                    }
-                }
-            }
-            sum *= (c / (currentA.size() * currentB.size()));
-        }
+    public float computeSimRank(int i, int j) {
+        return s(i, j, 0);
     }
 
     private float s(int i, int j, int iter) {
-        Set<Integer> inA = inNeighbors(a, i);
-        Set<Integer> inB = inNeighbors(b, j);
+        //Set<Integer> inA = inNeighbors(a, i);
+        //Set<Integer> inB = inNeighbors(b, j);
+        Set<Integer> inA = outNeighbors(a, i);
+        Set<Integer> inB = outNeighbors(b, j);
         inA.remove(0);
         inB.remove(0);
-        
+
         if (inA.isEmpty() || inB.isEmpty()) {
             return 0f;
         }

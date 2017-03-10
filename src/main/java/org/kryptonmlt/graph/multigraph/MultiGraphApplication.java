@@ -1,11 +1,9 @@
 package org.kryptonmlt.graph.multigraph;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import org.apache.commons.math3.linear.RealMatrix;
 import org.kryptonmlt.graph.multigraph.generator.StudentGraphCreator;
-import org.kryptonmlt.graph.multigraph.kernels.simrank.BasicSimilarity;
 import org.kryptonmlt.graph.multigraph.kernels.simrank.SimRank;
 import org.kryptonmlt.graph.multigraph.pojos.Student;
 import org.kryptonmlt.graph.multigraph.utils.DisplayUtils;
@@ -53,16 +51,6 @@ public class MultiGraphApplication {
         //System.out.println(RandomWalk.calculateKWalk(students.get(0).getStudentGraph(), students.get(1).getStudentGraph(), 0.9));
         SimRank simRank = new SimRank(students.get(0).getStudentGraph(), students.get(1).getStudentGraph());
         System.out.println("Similarity 0 to 1 : " + simRank.similarity());
-        SimRank simRank2 = new SimRank(students.get(0).getStudentGraph(), students.get(0).getStudentGraph());
-        System.out.println("Similarity 0 to 0 : " + simRank2.similarity());
-        SimRank simRank3 = new SimRank(students.get(1).getStudentGraph(), students.get(0).getStudentGraph());
-        System.out.println("Similarity 1 to 0 : " + simRank3.similarity());
-        SimRank simRank4 = new SimRank(students.get(1).getStudentGraph(), students.get(1).getStudentGraph());
-        System.out.println("Similarity 1 to 1 : " + simRank4.similarity());
-        BasicSimilarity basicSim = new BasicSimilarity(students.get(0).getStudentGraph(), students.get(1).getStudentGraph());
-        System.out.println("BasicSimilarity 0 to 1 : " + basicSim.similarity());
-        BasicSimilarity basicSim2 = new BasicSimilarity(students.get(0).getStudentGraph(), students.get(0).getStudentGraph());
-        System.out.println("BasicSimilarity 0 to 0 : " + basicSim2.similarity());
         //System.out.println(RandomWalk.calculateKWalk(students.get(0).getStudentGraph(), students.get(1).getStudentGraph(), 0.9));
     }
 
