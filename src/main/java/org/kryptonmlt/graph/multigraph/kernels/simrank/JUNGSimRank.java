@@ -34,7 +34,7 @@ public class JUNGSimRank {
      * @param g The graph
      * @return The SimRank, as a map from pairs of vertices to their similarity
      */
-    private static <V> Map<Pair<V>, Float> computeSimRank(Graph<V, ?> g) {
+    public static <V> Map<Pair<V>, Float> computeSimRank(Graph<V, ?> g) {
         final int kMax = 5;
         final float C = 0.8f;
 
@@ -122,7 +122,7 @@ public class JUNGSimRank {
      * @param g The graph
      * @param simRank The SimRank
      */
-    private static <V> void print(Graph<V, ?> g, Map<Pair<V>, Float> simRank) {
+    public static <V> void print(Graph<V, ?> g, Map<Pair<V>, Float> simRank) {
         final int columnWidth = 8;
         final String format = "%4.3f";
 
